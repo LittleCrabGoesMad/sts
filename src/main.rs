@@ -1,4 +1,3 @@
-mod effect;
 mod battle;
 mod card;
 mod entitie;

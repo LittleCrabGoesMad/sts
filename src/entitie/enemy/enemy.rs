@@ -1,6 +1,6 @@
 // use crate::effect::EffectDef;
 
-use crate::battle::BattleScript;
+use crate::battle::{BattleEntity, BattleScript, StatusDef, Statuses};
 
 pub struct EnemyDef {
     pub name :&'static str,
@@ -9,11 +9,13 @@ pub struct EnemyDef {
 }
 
 impl EnemyDef {
-    pub fn into_battle(&self) -> Enemy {
+    pub fn into_battle(&self, enemy_index: usize) -> Enemy {
         Enemy { 
             name: self.name, 
+            battle_entity: BattleEntity::Enemy(enemy_index),
             hp: self.max_hp,
             block: 0,
+            statuses: Statuses::new(),
             is_dead: false,
             enemy_script: self.enemy_script,
         }
@@ -21,8 +23,10 @@ impl EnemyDef {
 }
 pub struct Enemy {
     pub name :&'static str,
+    pub battle_entity: BattleEntity,
     pub hp :i32,
     pub block: i32,
+    pub statuses: Statuses,
     pub is_dead :bool,
     pub enemy_script: BattleScript,
 }
@@ -40,5 +44,16 @@ impl Enemy {
     pub fn obtain_block(&mut self, amount: &i32) {
         self.block += amount;
         println!("{}は{}ブロックを得た", self.name, amount);
+    }
+
+    // ステータスを適用する
+    pub fn apply_status(&mut self, status_def: &StatusDef, amount: &i32) {
+        let statuses :&mut Statuses = &mut self.statuses;
+        statuses.insert(status_def, *amount);
+        if status_def.is_positive {
+            println!("{}は{}を{}獲得した", self.name, status_def.name, amount);
+        } else {
+            println!("{}は{}を{}受けた", self.name, status_def.name, amount);
+        }
     }
 }
