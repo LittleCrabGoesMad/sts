@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use crate::battle::{StatusDef, Statuses};
 use crate::{BattleResult, battle::BattleScript};
 use crate::card::{BattleDeck, CardId, CardInstance, };
 
@@ -17,7 +18,8 @@ impl AscenderDef {
             name: self.name,
             max_hp: self.max_hp,
             current_hp: self.max_hp,
-            master_deck: self.build_master_deck(self.initial_deck), }
+            master_deck: self.build_master_deck(self.initial_deck), 
+        }
     }
 
     fn build_master_deck(&self, initial_deck: &[(CardId, u32)]) -> HashMap<CardId, u32> {
@@ -38,15 +40,16 @@ pub struct Ascender {
 }
 
 impl Ascender {
+    // 戦闘用のアセンダーに変換する
     pub fn into_battle(&self) -> BattleAscender {
         let deck = BattleDeck::new_from_master(&self.master_deck);
-
         BattleAscender {
             name: self.name,
             hp: self.current_hp, 
             max_energy: 3,
             energy: 0,
             block: 0,
+            statuses: Statuses::new(),
             is_dead: false,
             deck: deck, 
         }
@@ -59,6 +62,7 @@ pub struct BattleAscender {
     max_energy: u8,
     energy: u8,
     block: i32,
+    pub statuses: Statuses,
     pub is_dead: bool,
     pub deck: BattleDeck,
 }
@@ -91,16 +95,28 @@ impl BattleAscender {
         damage -= self.block;
         self.block = 0;
         self.hp -= damage;
-        println!("{}ダメージを受けてしまった", damage);
+        println!("{}は{}ダメージを受けてしまった", self.name, damage);
         if self.hp <= 0 {
             self.is_dead = true;
             println!("死んでしまった！！！");
         }
     }
 
+    // ブロックを獲得する
     pub fn obtain_block(&mut self, amount: &i32) {
-        println!("ブロックを{}獲得した", amount);
+        println!("{}はブロックを{}獲得した", self.name, amount);
         self.block += amount;
+    }
+
+    // ステータスを適用する
+    pub fn apply_status(&mut self, status_def: &StatusDef, amount: &i32) {
+        let statuses :&mut Statuses = &mut self.statuses;
+        statuses.insert(status_def, *amount);
+        if status_def.is_positive {
+            println!("{}は{}を{}獲得した", self.name, status_def.name, amount);
+        } else {
+            println!("{}は{}を{}受けた", self.name, status_def.name, amount);
+        }
     }
 
     // カード使用可能かどうか判定する

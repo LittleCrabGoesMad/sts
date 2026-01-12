@@ -1,5 +1,5 @@
 
-use crate::battle::{BattleSelector, Target};
+use crate::battle::{BattleSelector, BattleEntity};
 use crate::battle::battle_view::BattleView;
 use crate::battle::effect_resolver::EffectResolver;
 use crate::entitie::{Ascender, BattleAscender, Enemy, EnemyDef};
@@ -33,7 +33,8 @@ pub struct BattleContext {
 impl BattleContext {
     pub fn new(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> Self {
         let battle_ascender = ascender.into_battle();
-        let enemies: Vec<Enemy> = enemies_def.into_iter().map(|enemy| enemy.into_battle()).collect();
+        // 敵定義から戦闘用の敵を生成,敵のインデックスを付与
+        let enemies: Vec<Enemy> = enemies_def.into_iter().enumerate().map(|(index, enemy)| enemy.into_battle(index)).collect();
         BattleContext {
             battle_ascender,
             enemies,
@@ -71,7 +72,7 @@ impl BattleContext {
             // ここで0を入力するとターンが終了する
             let target_card = self.battle_selector.choose_card_for_play(&self.create_view())?;
             let chosen_card_index = match target_card {
-                Target::Card(index) => index,
+                BattleEntity::Card(index) => index,
                 _ => panic!("Invalid target for card index"),
             };
             if !self.battle_ascender.can_use_card(chosen_card_index) {
@@ -84,7 +85,9 @@ impl BattleContext {
     }
 }
 
-pub type BattleScript = fn(&EffectResolver, &mut BattleContext);
+// 各エンティティが実行する戦闘スクリプトの型
+// ここに展開された時点で、主体から切り離されているため、第一引数として主体を記述する
+pub type BattleScript = fn(&BattleEntity, &EffectResolver, &mut BattleContext);
 
 pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleResult {
     let mut context: BattleContext = BattleContext::new(&ascender, enemies_def);
@@ -97,7 +100,7 @@ pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleR
         while !context.is_end_battle {
             // カード使用一回分の処理
             if let Some(card_script) = context.try_play_card() {
-                card_script(&resolver, &mut context);
+                card_script(&BattleEntity::BattleAscender, &resolver, &mut context);
             } else {
                 // ターン終了処理
                 break;
@@ -112,12 +115,14 @@ pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleR
         //　借用の都合上、敵の行動を一体ずつ処理する
         let enemy_count = context.enemies.len();
         for i in 0..enemy_count {
-            let mut enemy: &mut Enemy = &mut context.enemies[i];
+            let enemy: &Enemy = &context.enemies[i];
             if enemy.is_dead {
                 continue;
             }
             // 敵の行動スクリプトを実行
-            (enemy.enemy_script)(&resolver, &mut context);
+            let enemy_entity = enemy.battle_entity;
+            let enemy_sctipt = enemy.enemy_script;
+            enemy_sctipt(&enemy_entity, &resolver, &mut context);
             if context.is_end_battle {
                 break;
             }

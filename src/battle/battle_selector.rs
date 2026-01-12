@@ -28,11 +28,11 @@ impl BattleSelector {
     }
 
     // 敵を１オリジンで選択させ、選択された敵のインデックス(0オリジン)を返す
-    pub fn choose_enemy(&self, view: BattleView) -> Target {
+    pub fn choose_enemy(&self, view: BattleView) -> BattleEntity {
         
         // 敵が１体だけなら自動的にそれを選択する
         if view.enemies.len() == 1 {
-            return Target::Enemy(0);
+            return BattleEntity::Enemy(0);
         }
 
         loop {
@@ -42,7 +42,7 @@ impl BattleSelector {
             let num = self.get_input_number();
 
             if num >= 1 && num <= view.enemies.len() {
-                return Target::Enemy(num - 1);
+                return BattleEntity::Enemy(num - 1);
             }
             println!("1~{}の範囲で入力してください", view.enemies.len());
         }
@@ -57,7 +57,7 @@ impl BattleSelector {
 
     // プレイのためにカードを選択(１オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるターン終了を認める
-    pub fn choose_card_for_play(&self, view: &BattleView) -> Option<Target> {
+    pub fn choose_card_for_play(&self, view: &BattleView) -> Option<BattleEntity> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
@@ -66,7 +66,7 @@ impl BattleSelector {
 
         // 手札が１枚だけなら自動的にそれを選択する
         if deck.hand.len() == 1 {
-            return Some(Target::Card(0));
+            return Some(BattleEntity::Card(0));
         }
 
         loop {
@@ -80,7 +80,7 @@ impl BattleSelector {
             }
 
             if num >= 1 && num <= deck.hand.len() {
-                return Some(Target::Card(num - 1));
+                return Some(BattleEntity::Card(num - 1));
             }
             println!("0~{}の範囲で入力してください", deck.hand.len());
         }
@@ -88,7 +88,7 @@ impl BattleSelector {
 
     // 効果のためにカードを選択(1オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるキャンセルは無し
-    pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<Target> {
+    pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<BattleEntity> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
@@ -97,7 +97,7 @@ impl BattleSelector {
 
         // 手札が１枚だけなら自動的にそれを選択する
         if deck.hand.len() == 1 {
-            return Some(Target::Card(0));
+            return Some(BattleEntity::Card(0));
         }
 
         loop {
@@ -106,7 +106,7 @@ impl BattleSelector {
             let num = self.get_input_number();
 
             if num >= 1 && num <= deck.hand.len() {
-                return Some(Target::Card(num - 1));
+                return Some(BattleEntity::Card(num - 1));
             }
             println!("1~{}の範囲で入力してください", deck.hand.len());
         }
@@ -120,9 +120,8 @@ impl BattleSelector {
     }
 }
 
-// クローン可能
-#[derive(Clone)]
-pub enum Target {
+#[derive(Clone, Copy, Debug)]
+pub enum BattleEntity {
     BattleAscender,
     Enemy(usize),
     Card(usize),
