@@ -5,6 +5,7 @@ use crate::card::{card_def::CardId};
 use crate::battle::BattleScript;
 
 #[derive (Debug, Clone)]
+#[allow(unused)]
 pub struct CardInstance {
     pub id: CardId,
     pub name: &'static str,

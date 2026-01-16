@@ -88,6 +88,7 @@ impl BattleSelector {
 
     // 効果のためにカードを選択(1オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるキャンセルは無し
+    #[allow(dead_code)]
     pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<BattleEntity> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す

@@ -45,7 +45,7 @@ impl BattleContext {
     }
 
     // 戦闘のビューを生成する
-    pub fn create_view(&self) -> BattleView {
+    pub fn create_view<'view>(&'view self) -> BattleView<'view> {
         BattleView {
             ascender: &self.battle_ascender,
             enemies: &self.enemies,
