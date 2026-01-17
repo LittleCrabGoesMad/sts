@@ -1,8 +1,7 @@
-
-use crate::battle::{BattleSelector, BattleEntity};
+use crate::battle::BattleSelector;
 use crate::battle::battle_view::BattleView;
 use crate::battle::effect_resolver::EffectResolver;
-use crate::entitie::{Ascender, BattleAscender, Enemy, EnemyDef};
+use crate::entitie::{Ascender, BattleAscender, Combatant, Enemy, EnemyDef};
 
 // 戦闘の結果
 pub struct BattleResult {
@@ -34,7 +33,7 @@ impl BattleContext {
     pub fn new(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> Self {
         let battle_ascender = ascender.into_battle();
         // 敵定義から戦闘用の敵を生成,敵のインデックスを付与
-        let enemies: Vec<Enemy> = enemies_def.into_iter().enumerate().map(|(index, enemy)| enemy.into_battle(index)).collect();
+        let enemies: Vec<Enemy> = enemies_def.iter().map(|def| def.into_battle()).collect();
         BattleContext {
             battle_ascender,
             enemies,
@@ -43,6 +42,22 @@ impl BattleContext {
             battle_selector: BattleSelector,
         }
     }
+
+    // 指定されたCombatantIdに対応するCombatantへの不変参照を返す
+    pub fn combatant(&self, id: CombatantId) -> &dyn Combatant {
+        match id {
+            CombatantId::Ascender => &self.battle_ascender,
+            CombatantId::Enemy(index) => &self.enemies[index],
+        }
+    }
+
+    // 指定されたCombatantIdに対応するCombatantへの可変参照を返す
+    pub fn combatant_mut(&mut self, id: CombatantId) -> &mut dyn Combatant {
+        match id {
+            CombatantId::Ascender => &mut self.battle_ascender,
+            CombatantId::Enemy(index) => &mut self.enemies[index],
+        }
+    }   
 
     // 戦闘のビューを生成する
     pub fn create_view<'view>(&'view self) -> BattleView<'view> {
@@ -70,11 +85,7 @@ impl BattleContext {
         // 使うカードをプレイヤーの入力で決定する
         loop {
             // ここで0を入力するとターンが終了する
-            let target_card = self.battle_selector.choose_card_for_play(&self.create_view())?;
-            let chosen_card_index = match target_card {
-                BattleEntity::Card(index) => index,
-                _ => panic!("Invalid target for card index"),
-            };
+            let chosen_card_index = self.battle_selector.choose_card_for_play(&self.create_view())?;
             if !self.battle_ascender.can_use_card(chosen_card_index) {
                 println!("エナジーが足りない......");
                 continue;
@@ -87,7 +98,14 @@ impl BattleContext {
 
 // 各エンティティが実行する戦闘スクリプトの型
 // ここに展開された時点で、主体から切り離されているため、第一引数として主体を記述する
-pub type BattleScript = fn(&BattleEntity, &EffectResolver, &mut BattleContext);
+pub type BattleScript = fn(CombatantId, &EffectResolver, &mut BattleContext);
+
+// スクリプトを実行する主体を識別するための列挙型
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum CombatantId {
+    Ascender,
+    Enemy(usize),
+}
 
 pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleResult {
     let mut context: BattleContext = BattleContext::new(&ascender, enemies_def);
@@ -100,7 +118,7 @@ pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleR
         while !context.is_end_battle {
             // カード使用一回分の処理
             if let Some(card_script) = context.try_play_card() {
-                card_script(&BattleEntity::BattleAscender, &resolver, &mut context);
+                card_script(CombatantId::Ascender, &resolver, &mut context);
             } else {
                 // ターン終了処理
                 break;
@@ -116,13 +134,12 @@ pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleR
         let enemy_count = context.enemies.len();
         for i in 0..enemy_count {
             let enemy: &Enemy = &context.enemies[i];
-            if enemy.is_dead {
+            if enemy.is_dead() {
                 continue;
             }
             // 敵の行動スクリプトを実行
-            let enemy_entity = enemy.battle_entity;
             let enemy_sctipt = enemy.enemy_script;
-            enemy_sctipt(&enemy_entity, &resolver, &mut context);
+            enemy_sctipt(CombatantId::Enemy(i), &resolver, &mut context);
             if context.is_end_battle {
                 break;
             }

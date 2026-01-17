@@ -1,5 +1,5 @@
 // 防御
-use crate::battle::{BattleContext, EffectDef, EffectResolver, BattleEntity};
+use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
 use crate::card::card_def::{CardDef, CardId, CardType};
 
 pub static DEFEND :CardDef = CardDef {
@@ -10,9 +10,9 @@ pub static DEFEND :CardDef = CardDef {
     card_script: defend_play,
 };
 
-pub fn defend_play(source: &BattleEntity, resolver: &EffectResolver, context: &mut BattleContext) {
+pub fn defend_play(source: CombatantId, resolver: &EffectResolver, context: &mut BattleContext) {
     println!("防御を発動!");
-    let target= BattleEntity::BattleAscender;
+    let target= CombatantId::Ascender;
     let obtain_block = EffectDef::ObtainBlock { amount: 1 };
-    resolver.apply(*source, obtain_block.to_effect(target), context);
+    resolver.apply(source, obtain_block.to_effect(target), context);
 }

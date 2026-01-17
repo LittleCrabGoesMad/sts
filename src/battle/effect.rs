@@ -1,4 +1,4 @@
-use crate::battle::{BattleEntity, StatusDef};
+use crate::battle::{StatusDef, CombatantId};
 
 #[allow(unused)]
 #[derive(Clone)]
@@ -9,7 +9,7 @@ pub enum EffectDef {
 }
 
 impl EffectDef {
-    pub fn to_effect(&self, target: BattleEntity) -> Effect {
+    pub fn to_effect(&self, target: CombatantId) -> Effect {
         match self {
             EffectDef::DealDamage { amount} => Effect::DealDamage { amount: *amount, target: target.clone() },
             EffectDef::ObtainBlock { amount } => Effect::ObtainBlock { amount: *amount, target: target.clone() },
@@ -20,7 +20,7 @@ impl EffectDef {
 
 #[allow(unused)]
 pub enum Effect {
-    DealDamage { amount: i32, target: BattleEntity },
-    ObtainBlock { amount: i32, target: BattleEntity },
-    ApplyStatus { status_def: StatusDef, amount: i32, target: BattleEntity },
+    DealDamage { amount: i32, target: CombatantId },
+    ObtainBlock { amount: i32, target: CombatantId },
+    ApplyStatus { status_def: StatusDef, amount: i32, target: CombatantId },
 }

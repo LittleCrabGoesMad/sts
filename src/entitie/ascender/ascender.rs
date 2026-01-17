@@ -2,7 +2,8 @@
 
 use std::collections::HashMap;
 
-use crate::battle::{StatusDef, Statuses};
+use crate::battle::Statuses;
+use crate::entitie::Combatant;
 use crate::{BattleResult, battle::BattleScript};
 use crate::card::{BattleDeck, CardId, CardInstance, };
 
@@ -62,8 +63,8 @@ pub struct BattleAscender {
     max_energy: u8,
     energy: u8,
     block: i32,
-    pub statuses: Statuses,
-    pub is_dead: bool,
+    statuses: Statuses,
+    is_dead: bool,
     pub deck: BattleDeck,
 }
 
@@ -82,42 +83,6 @@ impl BattleAscender {
     pub fn end_turn(&mut self) {
         self.deck.discard_hand();
     }
-    
-    pub fn take_damage(&mut self, amount: &i32) {
-        let mut damage = *amount;
-        if self.block >= damage {
-            // ブロックが上回るか同等の場合ブロック値を差し引いて終わり
-            self.block -= damage;
-            println!("攻撃を防ぎ切った！");
-            println!("{}のブロック:{}", self.name, self.block);
-            return;
-        }
-        damage -= self.block;
-        self.block = 0;
-        self.hp -= damage;
-        println!("{}は{}ダメージを受けてしまった", self.name, damage);
-        if self.hp <= 0 {
-            self.is_dead = true;
-            println!("死んでしまった！！！");
-        }
-    }
-
-    // ブロックを獲得する
-    pub fn obtain_block(&mut self, amount: &i32) {
-        println!("{}はブロックを{}獲得した", self.name, amount);
-        self.block += amount;
-    }
-
-    // ステータスを適用する
-    pub fn apply_status(&mut self, status_def: &StatusDef, amount: &i32) {
-        let statuses :&mut Statuses = &mut self.statuses;
-        statuses.insert(status_def, *amount);
-        if status_def.is_positive {
-            println!("{}は{}を{}獲得した", self.name, status_def.name, amount);
-        } else {
-            println!("{}は{}を{}受けた", self.name, status_def.name, amount);
-        }
-    }
 
     // カード使用可能かどうか判定する
     pub fn can_use_card(&self, chosen_card_index: usize) -> bool {
@@ -135,5 +100,39 @@ impl BattleAscender {
         self.deck.discard.push(card.clone());
         // カードスクリプトを生成して返す
         card.card_script
+    }
+}
+
+impl Combatant for BattleAscender {
+    fn get_name(&self) -> &str {
+        self.name
+    }
+
+    fn get_hp(&self) -> i32 {
+        self.hp
+    }
+    fn hp_mut(&mut self) -> &mut i32 {
+        &mut self.hp
+    }
+
+    fn get_block(&self) -> i32 {
+        self.block
+    }
+    fn block_mut(&mut self) -> &mut i32 {
+        &mut self.block
+    }
+
+    fn is_dead(&self) -> bool {
+        self.is_dead
+    }
+    fn set_dead(&mut self) {
+        self.is_dead = true;
+    }
+
+    fn get_statuses(&self) -> &Statuses {
+        &self.statuses
+    }
+    fn statuses_mut(&mut self) -> &mut Statuses {
+        &mut self.statuses
     }
 }

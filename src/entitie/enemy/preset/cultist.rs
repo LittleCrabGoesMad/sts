@@ -1,4 +1,4 @@
-use crate::battle::{BattleContext, EffectResolver, EffectDef, BattleEntity, STRENGTH};
+use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver, STRENGTH};
 use crate::entitie::EnemyDef;
 
 pub static CULTIST: EnemyDef = EnemyDef {
@@ -7,15 +7,15 @@ pub static CULTIST: EnemyDef = EnemyDef {
     enemy_script: cultist_action,
 };
 
-pub fn cultist_action(source: &BattleEntity, resolver: &EffectResolver, context: &mut BattleContext) {
+pub fn cultist_action(source: CombatantId, resolver: &EffectResolver, context: &mut BattleContext) {
     // 狂信者の行動: 毎ターン、アセンダーに1ダメージを与え、自身に1の筋力を付与する
     println!("狂信者の行動!");
 
-    let target = BattleEntity::BattleAscender;
+    let target = CombatantId::Ascender;
     let damage_effect = EffectDef::DealDamage { amount: 1 };
-    resolver.apply(*source, damage_effect.to_effect(target), context);
+    resolver.apply(source, damage_effect.to_effect(target), context);
 
-    let target = *source; // 自分自身に強化を付与
+    let target = source; // 自分自身に強化を付与
     let strength = EffectDef::ApplyStatus { status_def: STRENGTH.clone(), amount: 1 };
-    resolver.apply(*source, strength.to_effect(target), context);
+    resolver.apply(source, strength.to_effect(target), context);
 }

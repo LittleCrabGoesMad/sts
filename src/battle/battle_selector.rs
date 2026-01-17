@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crate::battle::battle_view::BattleView;
+use crate::{battle::{CombatantId, battle_view::BattleView}, entitie::Combatant};
 pub struct BattleSelector;
 
 impl BattleSelector {
@@ -28,11 +28,11 @@ impl BattleSelector {
     }
 
     // 敵を１オリジンで選択させ、選択された敵のインデックス(0オリジン)を返す
-    pub fn choose_enemy(&self, view: BattleView) -> BattleEntity {
+    pub fn choose_enemy(&self, view: BattleView) -> CombatantId {
         
         // 敵が１体だけなら自動的にそれを選択する
         if view.enemies.len() == 1 {
-            return BattleEntity::Enemy(0);
+            return CombatantId::Enemy(0);
         }
 
         loop {
@@ -42,7 +42,7 @@ impl BattleSelector {
             let num = self.get_input_number();
 
             if num >= 1 && num <= view.enemies.len() {
-                return BattleEntity::Enemy(num - 1);
+                return CombatantId::Enemy(num - 1);
             }
             println!("1~{}の範囲で入力してください", view.enemies.len());
         }
@@ -51,13 +51,13 @@ impl BattleSelector {
     // 敵の情報を表示する
     pub fn show_enemies(&self, view: &BattleView) {
         for (i, enemy) in view.enemies.iter().enumerate() {
-            println!("{}: {} HP:{}", i + 1, enemy.name, enemy.hp);
+            println!("{}: {} HP:{}", i + 1, enemy.get_name(), enemy.get_hp());
         }
     }
 
     // プレイのためにカードを選択(１オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるターン終了を認める
-    pub fn choose_card_for_play(&self, view: &BattleView) -> Option<BattleEntity> {
+    pub fn choose_card_for_play(&self, view: &BattleView) -> Option<usize> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
@@ -66,7 +66,7 @@ impl BattleSelector {
 
         // 手札が１枚だけなら自動的にそれを選択する
         if deck.hand.len() == 1 {
-            return Some(BattleEntity::Card(0));
+            return Some(0);
         }
 
         loop {
@@ -80,7 +80,7 @@ impl BattleSelector {
             }
 
             if num >= 1 && num <= deck.hand.len() {
-                return Some(BattleEntity::Card(num - 1));
+                return Some(num - 1);
             }
             println!("0~{}の範囲で入力してください", deck.hand.len());
         }
@@ -89,7 +89,7 @@ impl BattleSelector {
     // 効果のためにカードを選択(1オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるキャンセルは無し
     #[allow(dead_code)]
-    pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<BattleEntity> {
+    pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<usize> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
@@ -98,7 +98,7 @@ impl BattleSelector {
 
         // 手札が１枚だけなら自動的にそれを選択する
         if deck.hand.len() == 1 {
-            return Some(BattleEntity::Card(0));
+            return Some(0);
         }
 
         loop {
@@ -107,7 +107,7 @@ impl BattleSelector {
             let num = self.get_input_number();
 
             if num >= 1 && num <= deck.hand.len() {
-                return Some(BattleEntity::Card(num - 1));
+                return Some(num - 1);
             }
             println!("1~{}の範囲で入力してください", deck.hand.len());
         }
@@ -119,11 +119,4 @@ impl BattleSelector {
             println!("{}: {} コスト:{}", i + 1, card.name, card.cost);
         }
     }
-}
-
-#[derive(Clone, Copy, Debug)]
-pub enum BattleEntity {
-    BattleAscender,
-    Enemy(usize),
-    Card(usize),
 }

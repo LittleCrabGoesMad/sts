@@ -1,6 +1,6 @@
 // use crate::effect::EffectDef;
 
-use crate::battle::{BattleEntity, BattleScript, StatusDef, Statuses};
+use crate::{battle::{BattleScript, Statuses}, entitie::Combatant};
 
 pub struct EnemyDef {
     pub name :&'static str,
@@ -9,10 +9,9 @@ pub struct EnemyDef {
 }
 
 impl EnemyDef {
-    pub fn into_battle(&self, enemy_index: usize) -> Enemy {
+    pub fn into_battle(&self) -> Enemy {
         Enemy { 
             name: self.name, 
-            battle_entity: BattleEntity::Enemy(enemy_index),
             hp: self.max_hp,
             block: 0,
             statuses: Statuses::new(),
@@ -22,38 +21,44 @@ impl EnemyDef {
     }
 }
 pub struct Enemy {
-    pub name :&'static str,
-    pub battle_entity: BattleEntity,
-    pub hp :i32,
-    pub block: i32,
-    pub statuses: Statuses,
-    pub is_dead :bool,
+    name :&'static str,
+    hp :i32,
+    block: i32,
+    statuses: Statuses,
+    is_dead :bool,
     pub enemy_script: BattleScript,
 }
 
-impl Enemy {
-    pub fn take_damage(&mut self, amount: &i32) {
-        self.hp -= amount;
-        println!("{}は{}ダメージを受けた", self.name, amount);
-        if self.hp <= 0 {
-            self.is_dead = true;
-            println!("{}は倒れた！", self.name);
-        }
-    }
-    
-    pub fn obtain_block(&mut self, amount: &i32) {
-        self.block += amount;
-        println!("{}は{}ブロックを得た", self.name, amount);
+impl Combatant for Enemy {
+    fn get_name(&self) -> &str {
+        self.name
     }
 
-    // ステータスを適用する
-    pub fn apply_status(&mut self, status_def: &StatusDef, amount: &i32) {
-        let statuses :&mut Statuses = &mut self.statuses;
-        statuses.insert(status_def, *amount);
-        if status_def.is_positive {
-            println!("{}は{}を{}獲得した", self.name, status_def.name, amount);
-        } else {
-            println!("{}は{}を{}受けた", self.name, status_def.name, amount);
-        }
+    fn get_hp(&self) -> i32 {
+        self.hp
+    }
+    fn hp_mut(&mut self) -> &mut i32 {
+        &mut self.hp
+    }
+
+    fn get_block(&self) -> i32 {
+        self.block
+    }
+    fn block_mut(&mut self) -> &mut i32 {
+        &mut self.block
+    }
+
+    fn is_dead(&self) -> bool {
+        self.is_dead
+    }
+    fn set_dead(&mut self) {
+        self.is_dead = true;
+    }
+
+    fn get_statuses(&self) -> &Statuses {
+        &self.statuses
+    }
+    fn statuses_mut(&mut self) -> &mut Statuses {
+        &mut self.statuses
     }
 }
