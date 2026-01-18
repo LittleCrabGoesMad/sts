@@ -9,6 +9,8 @@ pub struct BattleDeck {
     pub draw_pile: Vec<CardInstance>,
     pub hand: Vec<CardInstance>,
     pub discard: Vec<CardInstance>,
+    // pub exhausted: Vec<CardInstance>,
+    pub used_power_cards: Vec<CardInstance>,
 }
 
 impl BattleDeck {
@@ -25,6 +27,7 @@ impl BattleDeck {
                     name: card_def.name,
                     brief_description: card_def.brief_description,
                     cost: card_def.cost,
+                    card_type: card_def.card_type,
                     card_script: card_def.card_script.clone(),
                 });
             }
@@ -34,6 +37,7 @@ impl BattleDeck {
             draw_pile: draw_pile,
             hand: Vec::new(),
             discard: Vec::new(),
+            used_power_cards: Vec::new(),
         };
 
         // 必ずシャッフルした状態で渡すこと

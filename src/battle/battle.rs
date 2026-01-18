@@ -10,13 +10,14 @@ pub struct BattleResult {
 }
 
 impl BattleResult {
-    pub fn apply_result(self, ascender: &mut Ascender) {
+    pub fn apply_result(self, ascender: &mut Ascender) -> bool{
         if self.victory {
             println!("戦闘に勝利！");
             ascender.current_hp = self.hp_after;
         } else {
             println!("死...");
         }
+        self.victory
     }
 }
 

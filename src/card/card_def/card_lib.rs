@@ -6,6 +6,9 @@ pub enum CardId {
     Strike,
     Defend,
     Bash,
+    PommelStrike,
+    Inflame,
+    Hemokinesis,
 }
 
 // マスターデッキのカードIDからCardDefを逆検索
@@ -14,5 +17,13 @@ pub fn get_card_def(id: CardId) -> &'static CardDef {
         CardId::Strike => &STRIKE,
         CardId::Defend => &DEFEND,
         CardId::Bash => &BASH,
+        CardId::PommelStrike => &POMMEL_STRIKE,
+        CardId::Inflame => &INFLAME,
+        CardId::Hemokinesis => &HEMOKINESIS,
     }
+}
+
+// カードIDからカード名を取得する
+pub fn get_card_name(id: CardId) -> &'static str {
+    get_card_def(id).name
 }

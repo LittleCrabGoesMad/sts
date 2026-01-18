@@ -39,8 +39,20 @@ impl EffectResolver {
                 let target_combatant = context.combatant_mut(target);
                 target_combatant.apply_status(&status_def, &amount);
             }
+
+            // カードを引く
+            Effect::DrawCards { amount, target } => {
+                if target == CombatantId::Ascender {
+                    context.battle_ascender.draw_cards(amount as usize);
+                }
+            }
+
         }
         sleep(Duration::from_millis(750)); // 効果適用の間に少し待機
+
+        // 死んだ敵を戦闘から除外する
+        context.enemies.retain(|enemy| !enemy.is_dead());
+
         // プレイヤーが死ぬか敵が全滅したら戦闘終了フラグを立てる
         if context.battle_ascender.is_dead() || context.enemies.iter().all(|enemy| enemy.is_dead()) {
             context.is_end_battle = true;

@@ -12,16 +12,9 @@ pub struct CardDef {
 }
 
 // カードのタイプ(アタック、スキル、パワー)
+#[derive (Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CardType {
     Attack,
     Skill,
-    // Power,
-}
-
-//　スクリプト内でユーザーに選択させる対象
-#[derive (Debug, Clone, Copy)]
-#[allow(unused)]
-pub enum TargetSpec {
-    NoTarget,
-    Enemy,
+    Power,
 }

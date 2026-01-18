@@ -4,13 +4,15 @@ use std::collections::HashMap;
 
 use crate::battle::Statuses;
 use crate::entitie::Combatant;
+use crate::game::SupplyDef;
 use crate::{BattleResult, battle::BattleScript};
-use crate::card::{BattleDeck, CardId, CardInstance, };
+use crate::card::{BattleDeck, CardId, CardInstance, CardType};
 
 pub struct AscenderDef {
     pub name: &'static str,
     pub max_hp: i32,
     pub initial_deck: &'static [(CardId, u32)],
+    pub initial_supply: SupplyDef,
 }
 
 impl AscenderDef {
@@ -55,6 +57,12 @@ impl Ascender {
             deck: deck, 
         }
     }
+
+    // マスターデッキにカードを追加する
+    pub fn add_card_to_master_deck(&mut self, card_id: CardId) {
+        let count = self.master_deck.entry(card_id).or_insert(0);
+        *count += 1;
+    }
 }
 
 pub struct BattleAscender {
@@ -98,14 +106,24 @@ impl BattleAscender {
         self.current_energy >= chosen_card_cost
     }
 
+    // カードを引く
+    pub fn draw_cards(&mut self, amount: usize) {
+        self.deck.draw_some(amount);
+    }
+
     // カード使用の共通処理
     pub fn play_card(&mut self, chosen_card_index: usize) -> BattleScript {
         // カードを手札から取り出す
         let card: CardInstance = self.deck.hand.remove(chosen_card_index);
         // エナジー消費
         self.current_energy -= card.cost;
-        // 捨て札に送る
-        self.deck.discard.push(card.clone());
+        if card.card_type == CardType::Power {
+            // パワーカードは使用済みエリアへ送る
+            self.deck.used_power_cards.push(card.clone());
+        } else {
+            // 捨て札に送る
+            self.deck.discard.push(card.clone());
+        }
         // カードスクリプトを生成して返す
         card.card_script
     }
