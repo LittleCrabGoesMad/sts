@@ -5,6 +5,7 @@ pub static CULTIST: EnemyDef = EnemyDef {
     name: "狂信者",
     max_hp: 9,
     enemy_script: cultist_action,
+    action_description: "1🗡  💪",
 };
 
 pub fn cultist_action(source: CombatantId, resolver: &EffectResolver, context: &mut BattleContext) {

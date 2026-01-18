@@ -1,6 +1,9 @@
+// battle/battle_selector.rs
+// 戦闘中の選択を扱うモジュール
+// Note: 標準出力による表現の内、このモジュールの責務は入力についての部分だけ、必然的に最後は「〜してください」という形をとる
 use std::io::{self, Write};
 
-use crate::{battle::{CombatantId, battle_view::BattleView}, entitie::Combatant};
+use crate::battle::{CombatantId, battle_view::BattleView};
 pub struct BattleSelector;
 
 impl BattleSelector {
@@ -38,20 +41,13 @@ impl BattleSelector {
         loop {
             // 引数に何のための選択なのか示すStringを追加する予定、例えば"攻撃対象を選んでください"など
             println!("\n敵を選択してください:");
-            self.show_enemies(&view);
+            view.render_enemies_summary();
             let num = self.get_input_number();
 
             if num >= 1 && num <= view.enemies.len() {
                 return CombatantId::Enemy(num - 1);
             }
             println!("1~{}の範囲で入力してください", view.enemies.len());
-        }
-    }
-
-    // 敵の情報を表示する
-    pub fn show_enemies(&self, view: &BattleView) {
-        for (i, enemy) in view.enemies.iter().enumerate() {
-            println!("{}: {} HP:{}", i + 1, enemy.get_name(), enemy.get_hp());
         }
     }
 
@@ -71,7 +67,7 @@ impl BattleSelector {
 
         loop {
             println!("\nカードを選択してください (0でターン終了):");
-            self.show_hand(&view);
+            view.render_hand();
             let num = self.get_input_number();
 
             // 0が入力されたらターン終了を示すNoneを返す
@@ -103,20 +99,13 @@ impl BattleSelector {
 
         loop {
             println!("カードを選択してください (0でターン終了):");
-            self.show_hand(&view);
+            view.render_hand();
             let num = self.get_input_number();
 
             if num >= 1 && num <= deck.hand.len() {
                 return Some(num - 1);
             }
             println!("1~{}の範囲で入力してください", deck.hand.len());
-        }
-    }
-
-    // 手札の情報を表示する
-    pub fn show_hand(&self, view: &BattleView) {
-        for (i, card) in view.ascender.deck.hand.iter().enumerate() {
-            println!("{}: {} コスト:{}", i + 1, card.name, card.cost);
         }
     }
 }

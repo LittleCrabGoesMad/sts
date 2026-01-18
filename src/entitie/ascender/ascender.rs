@@ -48,7 +48,7 @@ impl Ascender {
             name: self.name,
             hp: self.current_hp, 
             max_energy: 3,
-            energy: 0,
+            current_energy: 0,
             block: 0,
             statuses: Statuses::new(),
             is_dead: false,
@@ -61,7 +61,7 @@ pub struct BattleAscender {
     name: &'static str,
     hp: i32,
     max_energy: u8,
-    energy: u8,
+    current_energy: u8,
     block: i32,
     statuses: Statuses,
     is_dead: bool,
@@ -69,13 +69,21 @@ pub struct BattleAscender {
 }
 
 impl BattleAscender {
+    pub fn get_max_energy(&self) -> u8 {
+        self.max_energy
+    }
+
+    pub fn get_current_energy(&self) -> u8 {
+        self.current_energy
+    }
+
     pub fn out_of_battle(&self) -> BattleResult {
         let result: BattleResult = BattleResult { hp_after: self.hp, victory: !self.is_dead };
         result
     }
 
     pub fn start_turn(&mut self) {
-        self.energy = self.max_energy;
+        self.current_energy = self.max_energy;
         self.block = 0;
         self.deck.draw_some(5);
     }
@@ -87,7 +95,7 @@ impl BattleAscender {
     // カード使用可能かどうか判定する
     pub fn can_use_card(&self, chosen_card_index: usize) -> bool {
         let chosen_card_cost: u8 = self.deck.hand[chosen_card_index].cost;
-        self.energy >= chosen_card_cost
+        self.current_energy >= chosen_card_cost
     }
 
     // カード使用の共通処理
@@ -95,7 +103,7 @@ impl BattleAscender {
         // カードを手札から取り出す
         let card: CardInstance = self.deck.hand.remove(chosen_card_index);
         // エナジー消費
-        self.energy -= card.cost;
+        self.current_energy -= card.cost;
         // 捨て札に送る
         self.deck.discard.push(card.clone());
         // カードスクリプトを生成して返す

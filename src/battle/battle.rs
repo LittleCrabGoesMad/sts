@@ -70,14 +70,12 @@ impl BattleContext {
     // ターン開始処理
     fn start_ascender_turn (&mut self) {
         self.turn += 1;
-        println!("-- ターン {} 開始 --", self.turn);
         self.battle_ascender.start_turn();
     }
 
     // ターン終了処理
     fn end_ascender_turn (&mut self) {
         self.battle_ascender.end_turn();
-        println!("-- ターン {} 終了 --", self.turn);
     }
 
     // カードを使う
@@ -87,7 +85,7 @@ impl BattleContext {
             // ここで0を入力するとターンが終了する
             let chosen_card_index = self.battle_selector.choose_card_for_play(&self.create_view())?;
             if !self.battle_ascender.can_use_card(chosen_card_index) {
-                println!("エナジーが足りない......");
+                self.create_view().render_not_enough_energy();
                 continue;
             }
             let card_script: BattleScript = self.battle_ascender.play_card(chosen_card_index);
@@ -110,13 +108,15 @@ pub enum CombatantId {
 pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleResult {
     let mut context: BattleContext = BattleContext::new(&ascender, enemies_def);
     let resolver: EffectResolver = EffectResolver;
-    println!("=== 戦闘開始 ===");
-
+    
+    context.create_view().render_battle_start();
     loop {
         // アセンダーのターン
         context.start_ascender_turn();
+        context.create_view().render_turn_start();
         while !context.is_end_battle {
             // カード使用一回分の処理
+            context.create_view().render_combatant_summary();
             if let Some(card_script) = context.try_play_card() {
                 card_script(CombatantId::Ascender, &resolver, &mut context);
             } else {
@@ -148,7 +148,5 @@ pub fn battle_start(ascender: &Ascender, enemies_def: Vec<&EnemyDef>) -> BattleR
             break;
         }
     }
-
-    println!("=== 戦闘終了 ===");
     context.battle_ascender.out_of_battle()
 }

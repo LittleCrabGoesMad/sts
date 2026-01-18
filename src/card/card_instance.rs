@@ -9,6 +9,7 @@ use crate::battle::BattleScript;
 pub struct CardInstance {
     pub id: CardId,
     pub name: &'static str,
+    pub brief_description: &'static str,
     pub cost: u8,
     pub card_script: BattleScript,
 }

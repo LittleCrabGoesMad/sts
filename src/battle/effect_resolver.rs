@@ -1,3 +1,6 @@
+use std::thread::sleep;
+use std::time::Duration;
+
 use crate::battle::battle::CombatantId;
 use crate::battle::{BattleContext, Effect, STRENGTH, VULNERABLE};
 use crate::entitie::Combatant;
@@ -37,6 +40,7 @@ impl EffectResolver {
                 target_combatant.apply_status(&status_def, &amount);
             }
         }
+        sleep(Duration::from_millis(750)); // 効果適用の間に少し待機
         // プレイヤーが死ぬか敵が全滅したら戦闘終了フラグを立てる
         if context.battle_ascender.is_dead() || context.enemies.iter().all(|enemy| enemy.is_dead()) {
             context.is_end_battle = true;

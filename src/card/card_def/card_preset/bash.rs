@@ -5,6 +5,7 @@ use crate::card::card_def::{CardDef, CardId, CardType};
 pub static BASH :CardDef = CardDef {
     id: CardId::Bash,
     name: "強打",
+    brief_description: "2🗡️ 💔",
     cost: 2,
     card_type: CardType::Attack,
     card_script: bash_play,

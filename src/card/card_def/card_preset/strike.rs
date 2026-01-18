@@ -5,6 +5,7 @@ use crate::card::card_def::{CardDef, CardId, CardType};
 pub static STRIKE: CardDef = CardDef {
     id: CardId::Strike,
     name: "ストライク",
+    brief_description: "1🗡️",
     cost: 1,
     card_type: CardType::Attack,
     card_script: strike_play,

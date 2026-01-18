@@ -24,10 +24,17 @@ pub struct Statuses {
 
 // ステータス効果の管理
 impl Statuses {
+
     // コンストラクタ
     pub fn new() -> Self {
         Self { stacks: HashMap::new() }
     }
+
+    // 存在するステータス効果の一覧を取得する
+    pub fn list_statuses(&self) -> Vec<(StatusDef, i32)> {
+        self.stacks.iter().map(|(def, &amount)| (*def, amount)).collect()
+    }
+
     // ステータス効果を追加する
     // 既に存在する場合はスタック数を増加させ、なければ新規に追加する
     pub fn insert(&mut self, status_def: &StatusDef, amount: i32) {

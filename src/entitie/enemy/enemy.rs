@@ -6,6 +6,7 @@ pub struct EnemyDef {
     pub name :&'static str,
     pub max_hp :i32,
     pub enemy_script: BattleScript,
+    pub action_description: &'static str,
 }
 
 impl EnemyDef {
@@ -17,6 +18,7 @@ impl EnemyDef {
             statuses: Statuses::new(),
             is_dead: false,
             enemy_script: self.enemy_script,
+            action_description: self.action_description,
         }
     }
 }
@@ -27,6 +29,7 @@ pub struct Enemy {
     statuses: Statuses,
     is_dead :bool,
     pub enemy_script: BattleScript,
+    pub action_description: &'static str,
 }
 
 impl Combatant for Enemy {

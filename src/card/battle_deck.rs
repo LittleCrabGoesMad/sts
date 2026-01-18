@@ -20,9 +20,10 @@ impl BattleDeck {
             let card_def: &CardDef = get_card_def(*card_id);
 
             for _ in 0..*count {
-                draw_pile.push(CardInstance { 
+                draw_pile.push(CardInstance {
                     id: *card_id,
                     name: card_def.name,
+                    brief_description: card_def.brief_description,
                     cost: card_def.cost,
                     card_script: card_def.card_script.clone(),
                 });
