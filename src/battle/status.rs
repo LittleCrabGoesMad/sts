@@ -43,9 +43,15 @@ impl Statuses {
             .or_insert(amount);
     }
 
+    // ステータス効果が存在するか確認する
+    pub fn is_exist(&self, status_def: &StatusDef) -> bool {
+        self.stacks.contains_key(status_def)
+    }
+
     // ステータス効果のスタック数を取得する
-    pub fn get(&self, status_def: &StatusDef) -> i32 {
-        *self.stacks.get(status_def).unwrap_or(&0)
+    pub fn get_stacks(&self, status_def: &StatusDef) -> Option<i32> {
+        let value = self.stacks.get(status_def)?;
+        Some(*value)
     }
 
     // ステータス効果を消費する

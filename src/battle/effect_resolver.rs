@@ -2,7 +2,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use crate::battle::battle::CombatantId;
-use crate::battle::{BattleContext, Effect, STRENGTH, VULNERABLE};
+use crate::battle::{BattleContext, Effect};
 use crate::entitie::Combatant;
 
 pub struct EffectResolver;
@@ -19,12 +19,9 @@ impl EffectResolver {
             // ダメージを与える
             Effect::DealDamage { amount, target } => {
                 let mut damage = amount;
-                let strength = source_combatant.get_statuses().get(&STRENGTH);
-                    damage += strength;
+                damage = source_combatant.modify_outgoing_damage(damage);
                 let target_combatant = context.combatant_mut(target);
-                if target_combatant.statuses_mut().can_consume(&VULNERABLE, 1) {
-                    damage = damage * 2;
-                }
+                damage = target_combatant.modify_incoming_damage(damage,  true);
                 target_combatant.take_damage(&damage);
             }
 
