@@ -1,5 +1,5 @@
 // 強打
-use crate::battle::{BattleContext, EffectDef, EffectResolver,CombatantId, VULNERABLE};
+use crate::battle::{BattleContext, Effect, EffectResolver,CombatantId, VULNERABLE};
 use crate::card::card_def::{CardDef, CardId, CardType};
 
 pub static BASH :CardDef = CardDef {
@@ -16,8 +16,8 @@ pub fn bash_play(source: CombatantId, resolver: &EffectResolver, context: &mut B
     let target= {
         context.battle_selector.choose_enemy(context.create_view())
     };
-    let deal_damage = EffectDef::DealDamage { amount: 2 };
-    resolver.apply(source, deal_damage.to_effect(target), context);
-    let apply_vulnerable = EffectDef::ApplyStatus { status_def: VULNERABLE, amount: 1 };
-    resolver.apply(source, apply_vulnerable.to_effect(target), context);
+    let deal_damage = Effect::DealDamage { amount: 2, target };
+    resolver.apply(source, deal_damage, context);
+    let apply_vulnerable = Effect::ApplyStatus { status_def: VULNERABLE, amount: 1, target };
+    resolver.apply(source, apply_vulnerable, context);
 }

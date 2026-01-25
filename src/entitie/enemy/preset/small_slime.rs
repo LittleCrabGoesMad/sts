@@ -1,4 +1,4 @@
-use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
+use crate::battle::{BattleContext, CombatantId, Effect, EffectResolver};
 use crate::entitie::EnemyDef;
 
 pub static SMALL_SLIME: EnemyDef = EnemyDef {
@@ -13,6 +13,6 @@ pub fn small_slime_action(source: CombatantId, resolver: &EffectResolver, contex
     println!("スモールスライムの行動!");
 
     let target = CombatantId::Ascender;
-    let damage_effect = EffectDef::DealDamage { amount: 1 };
-    resolver.apply(source, damage_effect.to_effect(target), context);
+    let damage_effect = Effect::DealDamage { amount: 1, target };
+    resolver.apply(source, damage_effect, context);
 }

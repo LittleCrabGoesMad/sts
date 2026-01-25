@@ -1,5 +1,5 @@
 // ストライク
-use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
+use crate::battle::{BattleContext, CombatantId, Effect, EffectResolver};
 use crate::card::card_def::{CardDef, CardId, CardType};
 
 pub static STRIKE: CardDef = CardDef {
@@ -16,6 +16,6 @@ pub fn strike_play(source: CombatantId, resolver: &EffectResolver, context: &mut
     let target= {
         context.battle_selector.choose_enemy(context.create_view())
     };
-    let deal_damage = EffectDef::DealDamage { amount: 1 };
-    resolver.apply(source, deal_damage.to_effect(target), context);
+    let deal_damage = Effect::DealDamage { amount: 1, target };
+    resolver.apply(source, deal_damage, context);
 }
