@@ -45,6 +45,7 @@ impl BattleContext {
     }
 
     // 指定されたCombatantIdに対応するCombatantへの不変参照を返す
+    #[allow(unused)]
     pub fn combatant(&self, id: CombatantId) -> &dyn Combatant {
         match id {
             CombatantId::Ascender => &self.battle_ascender,

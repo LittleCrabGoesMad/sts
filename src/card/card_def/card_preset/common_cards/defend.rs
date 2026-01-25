@@ -13,7 +13,6 @@ pub static DEFEND :CardDef = CardDef {
 
 pub fn defend_play(source: CombatantId, resolver: &EffectResolver, context: &mut BattleContext) {
     println!("防御を発動!");
-    let target= CombatantId::Ascender;
     let obtain_block = EffectDef::ObtainBlock { amount: 1 };
-    resolver.apply(source, obtain_block.to_effect(target), context);
+    resolver.apply(source, obtain_block.to_effect(source), context);
 }

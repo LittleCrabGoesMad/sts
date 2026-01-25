@@ -1,6 +1,7 @@
 // ポンメルストライク
 use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
 use crate::card::card_def::{CardDef, CardId, CardType};
+
 pub static POMMEL_STRIKE: CardDef = CardDef {
     id: CardId::PommelStrike,
     name: "ポンメルストライク",

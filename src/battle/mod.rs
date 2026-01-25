@@ -11,4 +11,4 @@ pub use battle::{BattleContext, BattleResult, BattleScript, CombatantId, battle_
 pub use battle_selector::{BattleSelector};
 pub use effect_resolver::EffectResolver;
 pub use effect::{Effect, EffectDef};
-pub use status::{StatusDef, Statuses, STRENGTH, VULNERABLE};
+pub use status::{StatusDef, Statuses, STRENGTH, VULNERABLE, WEAK};
