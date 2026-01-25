@@ -1,5 +1,5 @@
 // ヘモキネシス
-use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
+use crate::battle::{BattleContext, CombatantId, Effect, EffectResolver};
 use crate::card::card_def::{CardDef, CardId, CardType};
 
 pub static HEMOKINESIS :CardDef = CardDef {
@@ -13,12 +13,12 @@ pub static HEMOKINESIS :CardDef = CardDef {
 
 pub fn hemokinesis_play(source: CombatantId, resolver: &EffectResolver, context: &mut BattleContext) {
     println!("ヘモキネシスを発動!");
-    let self_damage = EffectDef::DealDamage { amount: 1 };
-    resolver.apply(source, self_damage.to_effect(source), context);
+    let self_damage = Effect::DealDamage { amount: 1, target: source };
+    resolver.apply(source, self_damage, context);
 
     let target= {
         context.battle_selector.choose_enemy(context.create_view())
     };
-    let damage = EffectDef::DealDamage { amount: 3 };
-    resolver.apply(source, damage.to_effect(target), context);
+    let damage = Effect::DealDamage { amount: 3, target };
+    resolver.apply(source, damage, context);
 } 

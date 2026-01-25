@@ -1,4 +1,4 @@
-use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
+use crate::battle::{BattleContext, CombatantId, Effect, EffectResolver};
 use crate::entitie::EnemyDef;
 
 pub static ACID_SLIME: EnemyDef = EnemyDef {
@@ -13,6 +13,6 @@ pub fn acid_slime_action(source: CombatantId, resolver: &EffectResolver, context
     println!("アシッドスライムの行動!");
 
     let target = CombatantId::Ascender;
-    let damage_effect = EffectDef::DealDamage { amount: 2 };
-    resolver.apply(source, damage_effect.to_effect(target), context);
+    let damage_effect = Effect::DealDamage { amount: 2, target };
+    resolver.apply(source, damage_effect, context);
 }

@@ -1,5 +1,5 @@
 // ポンメルストライク
-use crate::battle::{BattleContext, CombatantId, EffectDef, EffectResolver};
+use crate::battle::{BattleContext, CombatantId, Effect, EffectResolver};
 use crate::card::card_def::{CardDef, CardId, CardType};
 pub static POMMEL_STRIKE: CardDef = CardDef {
     id: CardId::PommelStrike,
@@ -15,8 +15,8 @@ pub fn pommel_strike_play(source: CombatantId, resolver: &EffectResolver, contex
     let target= {
         context.battle_selector.choose_enemy(context.create_view())
     };
-    let deal_damage = EffectDef::DealDamage { amount: 2 };
-    resolver.apply(source, deal_damage.to_effect(target), context);
-    let draw_card = EffectDef::DrawCards { amount: 1 };
-    resolver.apply(source, draw_card.to_effect(source), context);
+    let deal_damage = Effect::DealDamage { amount: 2, target };
+    resolver.apply(source, deal_damage, context);
+    let draw_card = Effect::DrawCards { amount: 1, target: source };
+    resolver.apply(source, draw_card, context);
 }
