@@ -45,6 +45,7 @@ impl BattleContext {
     }
 
     // 指定されたCombatantIdに対応するCombatantへの不変参照を返す
+    #[allow(dead_code)]
     pub fn combatant(&self, id: CombatantId) -> &dyn Combatant {
         match id {
             CombatantId::Ascender => &self.battle_ascender,
@@ -84,7 +85,7 @@ impl BattleContext {
         // 使うカードをプレイヤーの入力で決定する
         loop {
             // ここで0を入力するとターンが終了する
-            let chosen_card_index = self.battle_selector.choose_card_for_play(&self.create_view())?;
+            let chosen_card_index = self.battle_selector.choose_card_for_play(self.create_view())?;
             if !self.battle_ascender.can_use_card(chosen_card_index) {
                 self.create_view().render_not_enough_energy();
                 continue;

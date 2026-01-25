@@ -9,6 +9,8 @@ pub enum CardId {
     PommelStrike,
     Inflame,
     Hemokinesis,
+    Neutralize,
+    Survivor,
 }
 
 // マスターデッキのカードIDからCardDefを逆検索
@@ -20,6 +22,8 @@ pub fn get_card_def(id: CardId) -> &'static CardDef {
         CardId::PommelStrike => &POMMEL_STRIKE,
         CardId::Inflame => &INFLAME,
         CardId::Hemokinesis => &HEMOKINESIS,
+        CardId::Neutralize => &NEUTRALIZE,
+        CardId::Survivor => &SURVIVOR,
     }
 }
 

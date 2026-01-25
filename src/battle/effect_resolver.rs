@@ -14,12 +14,12 @@ impl EffectResolver {
             // 戦闘が終了している場合は何もしない
             return;
         }
-        let source_combatant = context.combatant(source);
+        let source_combatant = context.combatant_mut(source);
         match effect {
             // ダメージを与える
             Effect::DealDamage { amount, target } => {
                 let mut damage = amount;
-                damage = source_combatant.modify_outgoing_damage(damage);
+                damage = source_combatant.modify_outgoing_damage(damage, true);
                 let target_combatant = context.combatant_mut(target);
                 damage = target_combatant.modify_incoming_damage(damage,  true);
                 target_combatant.take_damage(&damage);
@@ -42,6 +42,11 @@ impl EffectResolver {
                 if target == CombatantId::Ascender {
                     context.battle_ascender.draw_cards(amount as usize);
                 }
+            }
+
+            // カードを捨てる
+            Effect::Discard { target_hand_index } => {
+                context.battle_ascender.discard_hand(target_hand_index);
             }
 
         }

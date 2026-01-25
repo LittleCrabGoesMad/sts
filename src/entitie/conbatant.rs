@@ -1,7 +1,7 @@
 // entitie/conbatant.rs
 // 戦闘に参加する存在のトレイトを定義するモジュール
 
-use crate::battle::{STRENGTH, StatusDef, Statuses, VULNERABLE};
+use crate::battle::{STRENGTH, StatusDef, Statuses, VULNERABLE, WEAK};
 
 pub trait Combatant {
     fn get_name(&self) -> &str;
@@ -55,7 +55,7 @@ pub trait Combatant {
     }
 
     // 自身のステータスに基づいて与えるダメージを修正する
-    fn modify_outgoing_damage(&self, base_damage: i32) -> i32 {
+    fn modify_outgoing_damage(&mut self, base_damage: i32, needs_consume: bool) -> i32 {
         let mut modified_damage = base_damage;
 
         // 筋力によるダメージ増加
@@ -63,6 +63,19 @@ pub trait Combatant {
             modified_damage += strength;
         }
 
+        // 弱体化によるダメージ増加
+        // 弱体化があるか確認し、ある場合はダメージを二倍にする
+        if self.get_statuses().is_exist(&WEAK) {
+            modified_damage -= 1;
+            if needs_consume {
+                self.statuses_mut().can_consume(&WEAK, 1);
+            }
+        }
+
+        // ダメージが0未満にならないようにする
+        if modified_damage < 0 {
+            modified_damage = 0;
+        }
         modified_damage
     }
 

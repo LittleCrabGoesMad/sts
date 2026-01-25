@@ -74,8 +74,19 @@ impl BattleDeck {
         self.hand.len() > 0
     }
     
+    // 指定されたインデックスの手札を捨て札に送る
+    pub fn discard_hand(&mut self, target_card_index: usize) {
+        if target_card_index < self.hand.len() {
+            let card: CardInstance = self.hand.remove(target_card_index);
+            self.discard.push(card);
+        } else {
+            // 赤字で警告表示してアプリをクラッシュさせる
+            panic!("無効な手札インデックス: {}", target_card_index);
+        }
+    }
+
     // 手札を捨て札に全て送る
-    pub fn discard_hand(&mut self) {
+    pub fn discard_all_hands(&mut self) {
         while !self.hand.is_empty() {
             let card: CardInstance = self.hand.remove(0);
             self.discard.push(card);

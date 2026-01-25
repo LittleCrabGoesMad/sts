@@ -53,16 +53,11 @@ impl BattleSelector {
 
     // プレイのためにカードを選択(１オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるターン終了を認める
-    pub fn choose_card_for_play(&self, view: &BattleView) -> Option<usize> {
+    pub fn choose_card_for_play(&self, view: BattleView) -> Option<usize> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
             return None;
-        }
-
-        // 手札が１枚だけなら自動的にそれを選択する
-        if deck.hand.len() == 1 {
-            return Some(0);
         }
 
         loop {
@@ -85,7 +80,7 @@ impl BattleSelector {
     // 効果のためにカードを選択(1オリジン)させ、手札のインデックス(0オリジン)を返す
     // こちらでは0入力によるキャンセルは無し
     #[allow(dead_code)]
-    pub fn choose_card_for_effect(&self, view: &BattleView) -> Option<usize> {
+    pub fn choose_card_for_effect(&self, view: BattleView, description: &'static str) -> Option<usize> {
         let deck = &view.ascender.deck;
         // 手札がなければNoneを返す
         if !deck.has_hand() {
@@ -98,7 +93,7 @@ impl BattleSelector {
         }
 
         loop {
-            println!("カードを選択してください (0でターン終了):");
+            println!("{}", description);
             view.render_hand();
             let num = self.get_input_number();
 

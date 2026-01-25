@@ -80,7 +80,14 @@ pub static STRENGTH: StatusDef = StatusDef {
     is_positive: true,
 };
 
-// 弱体化: 受けるダメージが増加する
+// 脱力: 与えるダメージが１減少する
+pub static WEAK: StatusDef = StatusDef {
+    name: "脱力",
+    // description: "Decreases damage dealt.",
+    is_positive: false,
+};
+
+// 弱体化: 受けるダメージが二倍になる
 pub static VULNERABLE: StatusDef = StatusDef {
     name: "弱体化",
     // description: "Increases damage taken.",

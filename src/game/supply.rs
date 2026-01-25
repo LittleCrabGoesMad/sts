@@ -26,6 +26,7 @@ impl Supply {
 }
 
 // こちらは初期化用の定義
+#[derive(Clone, Copy)]
 pub struct SupplyDef {
     pub normal_reward_cards: &'static [(CardId, u32)],
 }

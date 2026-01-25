@@ -8,6 +8,7 @@ use crate::game::SupplyDef;
 use crate::{BattleResult, battle::BattleScript};
 use crate::card::{BattleDeck, CardId, CardInstance, CardType};
 
+#[derive(Clone, Copy)]
 pub struct AscenderDef {
     pub name: &'static str,
     pub max_hp: i32,
@@ -97,7 +98,7 @@ impl BattleAscender {
     }
 
     pub fn end_turn(&mut self) {
-        self.deck.discard_hand();
+        self.deck.discard_all_hands();
     }
 
     // カード使用可能かどうか判定する
@@ -111,6 +112,10 @@ impl BattleAscender {
         self.deck.draw_some(amount);
     }
 
+    // カードを捨てる
+    pub fn discard_hand(&mut self, target_hand_index: usize) {
+        self.deck.discard_hand(target_hand_index);
+    }
     // カード使用の共通処理
     pub fn play_card(&mut self, chosen_card_index: usize) -> BattleScript {
         // カードを手札から取り出す

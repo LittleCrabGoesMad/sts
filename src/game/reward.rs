@@ -1,9 +1,9 @@
 // game/reward.rs
 // ゲーム中の報酬に関するモジュール
-use std::io::{self, Write};
 use crate::card::{CardId, get_card_name};
 use crate::entitie::Ascender;
 use crate::game::Supply;
+use crate::get_input_number;
 
 // サプライの通常報酬からカードをマスターデッキに加える
 pub fn add_reward_card (ascener: &mut Ascender, supply: &mut Supply) {
@@ -33,26 +33,4 @@ fn offer_reward_cards(supply: &mut Supply, amount: usize) -> CardId {
         }
     }
     offered_cards[choice - 1]
-}
-
-fn get_input_number() -> usize {
-    loop {
-        print!("> ");
-        io::stdout().flush().unwrap();
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-
-        let trimmed = input.trim();
-
-        // 入力行をうかせるための改行
-        println!();
-
-        // 数字以外は弾く
-        let Ok(num) = trimmed.parse::<usize>() else {
-            println!("半角数字を入力してください");
-            continue;
-        };
-
-        return num;
-    }
 }

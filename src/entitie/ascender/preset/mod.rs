@@ -1,2 +1,6 @@
 // entitie/ascender/preset
-pub mod ironclad;
+mod ironclad;
+mod silent;
+
+pub use ironclad::IRONCLAD;
+pub use silent::SILENT;

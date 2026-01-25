@@ -6,4 +6,5 @@ pub enum Effect {
     ObtainBlock { amount: i32, target: CombatantId },
     ApplyStatus { status_def: StatusDef, amount: i32, target: CombatantId },
     DrawCards { amount: i32, target: CombatantId },
+    Discard { target_hand_index: usize }
 }
